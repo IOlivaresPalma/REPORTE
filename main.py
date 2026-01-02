@@ -1,10 +1,5 @@
 import os
 import sys
-from datetime import datetime
-from docxtpl import DocxTemplate,InlineImage
-import requests
-from docx.shared import Cm, Mm, Inches  # Para definir el tamaño
-import io
 
 # --- IMPORTACIÓN DE MÓDULOS PROPIOS ---
 # Aseguramos que Python encuentre la carpeta 'src'
@@ -26,8 +21,11 @@ except ImportError:
 
 
 
+
 def main():
 
+    
+    
     # 1. CONFIGURACIÓN DE RUTAS
     # Usamos rutas relativas para que funcione en cualquier PC
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -58,5 +56,10 @@ def main():
 
     print("Informe generado - prueba v0.1.1")
     
+    
 if __name__ == "__main__":
     main()
+
+
+
+

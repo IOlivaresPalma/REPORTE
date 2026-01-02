@@ -5,3 +5,4 @@ pillow        # Para procesar/redimensionar imágenes
 python-dotenv # (Opcional) Si conectas a SQL Server/Postgres
 sqlalchemy    # Para leer el archivo .env
 requests
+pyodbc
