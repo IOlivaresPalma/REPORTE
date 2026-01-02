@@ -1,3 +1,2 @@
-.env/
-
-.sql/
+# Ignorar .env -- Credenciales de Empresa
+.env
