@@ -11,7 +11,7 @@ sys.path.append(src_path)
 
 try:
     # Intenta importar tus módulos si ya creaste los archivos
-    from load_data import cargar_datos_excel
+    from load_data import cargar_datos_excel,get_data
     from get_image import obtener_imagen_procesada
     from report_generator import generate_word,generate_directory
 except ImportError:
@@ -44,15 +44,15 @@ def main():
         # datos_crudos = cargar_datos_excel(DATA_PATH) 
         
         # Por ahora usamos el fallback/simulación si no hay excel
-        datos_crudos = cargar_datos_excel(None) 
+        RAW_DATA = get_data()
         
-        print(f"   ✅ Se cargaron {len(datos_crudos)} registros.")
+        print(f"   ✅ Se cargaron {len(RAW_DATA)} registros.")
     except Exception as e:
         print(f"❌ Error cargando datos: {e}")
         return
 
     
-    generate_word(BASE_DIR,datos_crudos)
+    generate_word(BASE_DIR,RAW_DATA)
 
     print("Informe generado - prueba v0.1.1")
     
