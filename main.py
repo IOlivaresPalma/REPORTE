@@ -1,10 +1,6 @@
 import os
 import sys
-from datetime import datetime
-from docxtpl import DocxTemplate,InlineImage
-import requests
-from docx.shared import Cm, Mm, Inches  # Para definir el tamaño
-import io
+import pyodbc
 
 # --- IMPORTACIÓN DE MÓDULOS PROPIOS ---
 # Aseguramos que Python encuentre la carpeta 'src'
@@ -60,3 +56,13 @@ def main():
     
 if __name__ == "__main__":
     main()
+
+
+
+
+
+def aparte():
+
+    
+
+    return

@@ -1,2 +1,4 @@
 # Ignorar .env -- Credenciales de Empresa
 .env
+
+.venv/*
