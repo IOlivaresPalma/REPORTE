@@ -1,5 +1,16 @@
+import pyodbc
+import dotenv
 
+def get_data():
 
+    connection = pyodbc.connect(driver = "{SQL Server}",server="10.10.2.55\QBIZ_TEST",database = "datascope",uid = "calidad_datascope",pwd = "Temp#Calidad2025!")
+    cur = connection.cursor()
+    db_cmd = "SELECT * FROM dbo.v_CONTRAMUESTRAS"
+    res = cur.execute(db_cmd)
+    for r in res:
+        print(r)
+
+    return
 
 def cargar_datos_excel(path):
     # Datos simulados basados en tu captura de pantalla
