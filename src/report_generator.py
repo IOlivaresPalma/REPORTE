@@ -26,23 +26,52 @@ def generate_word(BASE_DIR,RAW_DATA):
     print("🖼️ Procesando imágenes (esto puede tardar unos segundos)...")
     
     items_para_reporte = []
-    
+
+    # Descomentar para depurar
+    #print(RAW_DATA)   
     for idx, item in enumerate(RAW_DATA):
+
+        
+        
         # Creamos una copia del diccionario para no modificar la data original
+
         item_procesado = item.copy()
         
         # Obtenemos la URL de la columna 'image_url' (ajusta este nombre según tu Excel)
-        url_imagen = item.get('image_url', '')
-        
-
+        url_foto_etiqueta = item.get('foto_etiqueta', '')
+        url_foto_open     = item.get('foto_open', '')
+        url_foto_open2    = item.get('foto_open2', '')
+        url_foto_bandeja  = item.get('foto_bandeja','')
+        url_foto_partida  = item.get('foto_frutapartida','')
+        url_foto_defecto1 = item.get('foto_defecto1','')
+        url_foto_defecto2 = item.get('foto_defecto2','')
         # Llamamos a la función de process_image
         # Ajustar tamaño de imagen en Cm
-        size = 3
+        size = 4
 
-        image_obj = process_image(url_imagen,doc,size)
-        # Guardamos el objeto imagen en una nueva clave que usarás en Word: {{ item.imagen_renderizada }}
-        item_procesado['imagen_renderizada'] = image_obj
+        image_etiqueta = process_image(url_foto_etiqueta,doc,size)
+        image_open     = process_image(url_foto_open,doc,size)
+        image_open2    = process_image(url_foto_open2,doc,size)
+        image_bandeja  = process_image(url_foto_bandeja,doc,size)
+        image_partida  = process_image(url_foto_partida,doc,size)
+        if url_foto_defecto1 != "":
+            image_defecto1 = process_image(url_foto_defecto1,doc,size)
+            item_procesado['foto_defecto1'] = image_defecto1
+        if url_foto_defecto2 != "":
+            image_defecto2 = process_image(url_foto_defecto2,doc,size)
+            item_procesado['foto_defecto2'] = image_defecto2
         
+        # Guardamos el objeto imagen en una nueva clave que usarás en Word: {{ item.imagen_renderizada }}
+        item_procesado['foto_open']     = image_open
+        item_procesado['foto_open2']    = image_open2
+        item_procesado['foto_etiqueta'] = image_etiqueta
+        item_procesado['foto_bandeja']  = image_bandeja
+        item_procesado['foto_partida']  = image_partida
+        
+        
+
+    
+
         items_para_reporte.append(item_procesado)
         print(f"   - Procesado item {idx+1}/{len(RAW_DATA)}: {item.get('box_id', 'Sin ID')}")
 
@@ -51,6 +80,8 @@ def generate_word(BASE_DIR,RAW_DATA):
         'titulo': 'QUALITY CONTROL',
         'fecha_generacion': datetime.now().strftime("%d-%m-%Y"),
         'usuario': 'Analista BI',
+        'columnas':["Box_Id","Soft","Wound","Bruise","Stain","Cracking","No Stem",
+                    "Pitting","Decay","Avg Brix","Firmness","Open"],
         'items': items_para_reporte,  # Esta es la clave que usas en el loop {%tr for item in items %}
     }
 
