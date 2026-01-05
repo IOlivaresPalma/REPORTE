@@ -6,7 +6,7 @@ import requests
 import io
 
 
-def generate_word(BASE_DIR,RAW_DATA):
+def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
 
     # Rutas de entrada
     TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates', 'master_template.docx')
@@ -29,6 +29,7 @@ def generate_word(BASE_DIR,RAW_DATA):
 
     # Descomentar para depurar
     #print(RAW_DATA)   
+    
     for idx, item in enumerate(RAW_DATA):
 
         
@@ -47,7 +48,7 @@ def generate_word(BASE_DIR,RAW_DATA):
         url_foto_defecto2 = item.get('foto_defecto2','')
         # Llamamos a la función de process_image
         # Ajustar tamaño de imagen en Cm
-        size = 4
+        size = 3.5
 
         image_etiqueta = process_image(url_foto_etiqueta,doc,size)
         image_open     = process_image(url_foto_open,doc,size)
@@ -74,17 +75,30 @@ def generate_word(BASE_DIR,RAW_DATA):
 
         items_para_reporte.append(item_procesado)
         print(f"   - Procesado item {idx+1}/{len(RAW_DATA)}: {item.get('box_id', 'Sin ID')}")
+    
+    detalles = {}
+    i = 0
+    for diccionario in RAW_DATA_DETALLES:
+        dic = f"dict_{i}"
+        lista = []
+        for _,value in diccionario.items():
+            lista.append(value)
+        detalles[dic] = lista
+        i+=1
 
+    print(detalles)
     # 5. RENDERIZADO
     context = {
         'titulo': 'QUALITY CONTROL',
         'fecha_generacion': datetime.now().strftime("%d-%m-%Y"),
         'usuario': 'Analista BI',
-        'columnas':["Box_Id","Soft","Wound","Bruise","Stain","Cracking","No Stem",
+        'columnas':["Box Id","Soft","Wound","Bruise","Stain","Cracking","No Stem",
                     "Pitting","Decay","Avg Brix","Firmness","Open"],
+        'columnas2':["Box Id","Producer","csg","Lot","Variety","Packing Date","Evaluation Date","Package","Label","Size"],
         'items': items_para_reporte,  # Esta es la clave que usas en el loop {%tr for item in items %}
+        'details':detalles
     }
-
+    
     print("⚙️ Renderizando documento Word...")
     try:
         doc.render(context)
@@ -126,12 +140,14 @@ def generate_directory(BASE_DIR,TEMPLATE_PATH):
 
 def process_image(image_url,doc,size = 5):
 
-    response = requests.get(image_url)
+    if image_url is not None:
+        response = requests.get(image_url) 
 
-    if response.status_code == 200:
-        image_stream = io.BytesIO(response.content)
-        image_obj = InlineImage(doc, image_stream, width=Cm(size))
-
+        if response.status_code == 200:
+            image_stream = io.BytesIO(response.content)
+            image_obj = InlineImage(doc, image_stream, width=Cm(size))
+    else:
+        image_obj = image_url
     return image_obj
 
 
