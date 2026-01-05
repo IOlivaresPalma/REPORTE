@@ -1,13 +1,13 @@
 import pyodbc
 from dotenv import dotenv_values
 
-def get_data():
+def get_data(fecha_registro="2025-01-01"):
 
     config = dotenv_values(".env")
     
     connection = pyodbc.connect(driver = "{SQL Server}",server=config["DB_HOST"],database = config["DB_NAME"],uid = config["DB_USER"],pwd = config["DB_PASSWORD"])
     cur = connection.cursor()
-    db_cmd = "SELECT * FROM dbo.v_CONTRAMUESTRAS where g_tipo_muestra = 'CONTRAMUESTRA' and d_codigo_caja != '' and foto_defecto != '' and fecha_registro= '2025-12-31'"
+    db_cmd = f"SELECT * FROM dbo.v_CONTRAMUESTRAS where g_tipo_muestra = 'CONTRAMUESTRA' and d_codigo_caja != '' and foto_defecto != '' and fecha_registro= '{fecha_registro}'"
     res = cur.execute(db_cmd)
 
     RAW_DATA = []
