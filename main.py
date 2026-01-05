@@ -44,17 +44,17 @@ def main():
         # datos_crudos = cargar_datos_excel(DATA_PATH) 
         
         # Por ahora usamos el fallback/simulación si no hay excel
-        RAW_DATA = get_data(fecha_filtro)
+        RAW_DATA_CONDICION,RAW_DATA_DETALLES = get_data(fecha_filtro)
         
-        print(f"   ✅ Se cargaron {len(RAW_DATA)} registros.")
+        print(f"   ✅ Se cargaron {len(RAW_DATA_CONDICION)} registros.")
     except Exception as e:
         print(f"❌ Error cargando datos: {e}")
         return
 
     
-    generate_word(BASE_DIR,RAW_DATA)
+    generate_word(BASE_DIR,RAW_DATA_CONDICION,RAW_DATA_DETALLES)
 
-    print("Informe generado - prueba v0.1.1")
+    #print("Informe generado - prueba v0.1.1")
     
     
 if __name__ == "__main__":
