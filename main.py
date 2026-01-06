@@ -59,7 +59,8 @@ def main():
     
 if __name__ == "__main__":
     main()
-
+    print("Proceso finalizado.")
+    input("Presiona ENTER para salir...")
 
 
 

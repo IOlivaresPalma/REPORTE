@@ -126,8 +126,9 @@ def generate_directory(BASE_DIR,TEMPLATE_PATH):
     else:
         # Rutas de salida (creamos carpeta con fecha actual para orden)
         fecha_hoy = datetime.now().strftime("%Y-%m-%d")
+        fecha_hoy_hora = datetime.now().strftime("%Y-%m-%d %H-%M")
         OUTPUT_DIR = os.path.join(BASE_DIR, 'output', fecha_hoy)
-        OUTPUT_FILE = os.path.join(OUTPUT_DIR, f'Reporte_Calidad_{fecha_hoy}.docx')
+        OUTPUT_FILE = os.path.join(OUTPUT_DIR, f'Reporte_Calidad_{fecha_hoy_hora}.docx')
 
         # Crear directorio de salida si no existe
         os.makedirs(OUTPUT_DIR, exist_ok=True)
