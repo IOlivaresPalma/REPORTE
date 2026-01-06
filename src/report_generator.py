@@ -112,7 +112,6 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
         
     except Exception as e:
         print(f" Error al guardar el documento final: {e}")
-        print("   (Sugerencia: Cierra el archivo Word si lo tienes abierto)")
     
     return
 
@@ -121,7 +120,6 @@ def generate_directory(BASE_DIR,TEMPLATE_PATH):
     # Verificar existencia de plantilla
     if not os.path.exists(TEMPLATE_PATH):
         print(f" ERROR: No se encontró la plantilla en: {TEMPLATE_PATH}")
-        print("   Por favor crea la carpeta 'templates' y pon tu archivo 'master_template.docx' ahí.")
         return
     else:
         # Rutas de salida (creamos carpeta con fecha actual para orden)
