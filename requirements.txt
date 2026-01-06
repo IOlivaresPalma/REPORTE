@@ -7,3 +7,4 @@ sqlalchemy    # Para leer el archivo .env
 requests
 pyodbc
 psycopg2      # Conectar a PostgreSQL
+pyinstaller
