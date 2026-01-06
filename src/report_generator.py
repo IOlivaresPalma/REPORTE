@@ -54,12 +54,12 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
         image_open     = process_image(url_foto_open,doc,size)
         image_open2    = process_image(url_foto_open2,doc,size)
         image_bandeja  = process_image(url_foto_bandeja,doc,size)
-        image_partida  = process_image(url_foto_partida,doc,size)
+        image_partida  = process_image(url_foto_partida,doc,size=4)
         if url_foto_defecto1 != "":
-            image_defecto1 = process_image(url_foto_defecto1,doc,size)
+            image_defecto1 = process_image(url_foto_defecto1,doc,size=4)
             item_procesado['foto_defecto1'] = image_defecto1
         if url_foto_defecto2 != "":
-            image_defecto2 = process_image(url_foto_defecto2,doc,size)
+            image_defecto2 = process_image(url_foto_defecto2,doc,size=4)
             item_procesado['foto_defecto2'] = image_defecto2
         
         # Guardamos el objeto imagen en una nueva clave que usarás en Word: {{ item.imagen_renderizada }}
