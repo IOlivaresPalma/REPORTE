@@ -23,8 +23,11 @@ def get_data(fecha_registro="2025-01-01"):
     
     return RAW_DATA_CONDICION,RAW_DATA_DETALLES
 
+
+
+# Prueba de datos
 def cargar_datos_excel(path):
-    # Datos simulados basados en tu captura de pantalla
+    
     return [
         {
             'box_id': '30395715', 'producer': 'PRIZE PROSERVICE', 'csg': '178244',

@@ -17,12 +17,12 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
     try:
         doc = DocxTemplate(TEMPLATE_PATH)
     except Exception as e:
-        print(f"❌ Cannot open Word Template: {e}")
+        print(f" Cannot open Word Template: {e}")
         return
 
     ########################################
     # 4. PROCESAMIENTO DE IMÁGENES
-    # Iteramos sobre los datos para convertir URLs en objetos de imagen de Word
+    # 
     print("🖼️ Procesando imágenes (esto puede tardar unos segundos)...")
     
     items_para_reporte = []
@@ -99,19 +99,19 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
         'details':detalles
     }
     
-    print("⚙️ Renderizando documento Word...")
+    print(" Renderizando documento Word...")
     try:
         doc.render(context)
         
         # 6. GUARDADO
         doc.save(OUTPUT_FILE)
-        print(f"✅ ¡ÉXITO! Reporte guardado en:\n   {OUTPUT_FILE}")
+        print(f" ¡ÉXITO! Reporte guardado en:\n   {OUTPUT_FILE}")
         
         # Opcional: Abrir la carpeta automáticamente (solo Windows)
         os.startfile(OUTPUT_DIR)
         
     except Exception as e:
-        print(f"❌ Error al guardar el documento final: {e}")
+        print(f" Error al guardar el documento final: {e}")
         print("   (Sugerencia: Cierra el archivo Word si lo tienes abierto)")
     
     return
@@ -120,7 +120,7 @@ def generate_directory(BASE_DIR,TEMPLATE_PATH):
     
     # Verificar existencia de plantilla
     if not os.path.exists(TEMPLATE_PATH):
-        print(f"❌ ERROR: No se encontró la plantilla en: {TEMPLATE_PATH}")
+        print(f" ERROR: No se encontró la plantilla en: {TEMPLATE_PATH}")
         print("   Por favor crea la carpeta 'templates' y pon tu archivo 'master_template.docx' ahí.")
         return
     else:

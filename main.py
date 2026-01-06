@@ -2,7 +2,7 @@ import os
 import sys
 
 # --- IMPORTACIÓN DE MÓDULOS PROPIOS ---
-# Aseguramos que Python encuentre la carpeta 'src'
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 src_path = os.path.join(current_dir, 'src')
 sys.path.append(src_path)
@@ -10,13 +10,12 @@ sys.path.append(src_path)
 # Se importan archivos desde el file
 
 try:
-    # Intenta importar tus módulos si ya creaste los archivos
+    # Importar codigos src
     from load_data import cargar_datos_excel,get_data
     from get_image import obtener_imagen_procesada
     from report_generator import generate_word,generate_directory
 except ImportError:
-    # FALLBACK: Si aún no creas los archivos en /src, usamos estas funciones dummy
-    # para que el script corra sin errores ahora mismo.
+    
     print("⚠️ ALERTA: Usando funciones de prueba (Módulos src no encontrados)")
 
 
@@ -39,16 +38,13 @@ def main():
 
     # 2. CARGA DE DATOS
     try:
-        print(f"📥 Cargando datos...")
-        # Si usas el Excel real, descomenta la siguiente línea y asegúrate que el archivo existe
-        # datos_crudos = cargar_datos_excel(DATA_PATH) 
-        
-        # Por ahora usamos el fallback/simulación si no hay excel
+        print(f" Cargando datos...")
+        # Cargar datos de condicion de fruta y detalle de cajas
         RAW_DATA_CONDICION,RAW_DATA_DETALLES = get_data(fecha_filtro)
         
-        print(f"   ✅ Se cargaron {len(RAW_DATA_CONDICION)} registros.")
+        print(f"    Se cargaron {len(RAW_DATA_CONDICION)} registros.")
     except Exception as e:
-        print(f"❌ Error cargando datos: {e}")
+        print(f" Error cargando datos: {e}")
         return
 
     
