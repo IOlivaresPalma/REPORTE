@@ -86,7 +86,7 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
         detalles[dic] = lista
         i+=1
 
-    print(detalles)
+    #print(detalles)
     # 5. RENDERIZADO
     context = {
         'titulo': 'QUALITY CONTROL',
@@ -117,6 +117,7 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
 
 def generate_directory(BASE_DIR,TEMPLATE_PATH):
     
+    ruta_documentos = os.path.expandvars("%userprofile%\\Documents")
     # Verificar existencia de plantilla
     if not os.path.exists(TEMPLATE_PATH):
         print(f" ERROR: No se encontró la plantilla en: {TEMPLATE_PATH}")
@@ -125,7 +126,7 @@ def generate_directory(BASE_DIR,TEMPLATE_PATH):
         # Rutas de salida (creamos carpeta con fecha actual para orden)
         fecha_hoy = datetime.now().strftime("%Y-%m-%d")
         fecha_hoy_hora = datetime.now().strftime("%Y-%m-%d %H-%M")
-        OUTPUT_DIR = os.path.join(BASE_DIR, 'output', fecha_hoy)
+        OUTPUT_DIR = os.path.join(ruta_documentos, 'REPORTE CONTRAMUESTRAS', fecha_hoy)
         OUTPUT_FILE = os.path.join(OUTPUT_DIR, f'Reporte_Calidad_{fecha_hoy_hora}.docx')
 
         # Crear directorio de salida si no existe

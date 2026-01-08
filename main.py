@@ -23,8 +23,21 @@ except ImportError:
 
 def main():
 
-    fecha_filtro = input("Ingrese fecha de registro en formato YYYY-MM-DD: ")
-    
+    #fecha_filtro = input("Ingrese fecha de registro en formato YYYY-MM-DD: ")
+    if len(sys.argv) > 1:
+        fecha_filtro = sys.argv[1] # El argumento que enviaste desde C#
+        if ";" in fecha_filtro:
+            lista_fechas = fecha_filtro.split(";")
+        else:
+            lista_fechas = [fecha_filtro]
+    else:
+        # Por si lo ejecutas manual para probar
+        fecha_filtro = "2026-01-01" 
+
+    for fecha in lista_fechas:
+        print(f"filtrando por: {fecha}")
+
+
     # 1. CONFIGURACIÓN DE RUTAS
     # Usamos rutas relativas para que funcione en cualquier PC
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -40,7 +53,7 @@ def main():
     try:
         print(f" Cargando datos...")
         # Cargar datos de condicion de fruta y detalle de cajas
-        RAW_DATA_CONDICION,RAW_DATA_DETALLES = get_data(fecha_filtro)
+        RAW_DATA_CONDICION,RAW_DATA_DETALLES = get_data(lista_fechas)
         
         print(f"    Se cargaron {len(RAW_DATA_CONDICION)} registros.")
     except Exception as e:
