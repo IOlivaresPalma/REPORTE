@@ -117,6 +117,8 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
 
 def generate_directory(BASE_DIR,TEMPLATE_PATH):
     
+    
+
     ruta_documentos = os.path.expandvars("%userprofile%\\Documents")
     # Verificar existencia de plantilla
     if not os.path.exists(TEMPLATE_PATH):

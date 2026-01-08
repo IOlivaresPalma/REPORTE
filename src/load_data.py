@@ -1,18 +1,20 @@
 import pyodbc
-from dotenv import dotenv_values
+from dotenv import dotenv_values,load_dotenv
 import psycopg2
 import datetime
 from datetime import datetime
+import os
 
-def get_data(fecha_registro="2025-01-01"):
+def get_data(fecha_registro="2025-01-01",variedad="TODAS"):
 
+    load_dotenv(os.path.join(os.getcwd(), ".env"))
     config = dotenv_values(".env")
     
     #RAW_DATA_CONDICION,LISTA_CAJAS = get_sqlServer_data(config,fecha_registro)
 
     #RAW_DATA_DETALLES= get_postgres_data(LISTA_CAJAS,config)
 
-    RAW_DATA_CONDICION,RAW_DATA_DETALLES = get_postgres_data_test(fecha_registro,config)
+    RAW_DATA_CONDICION,RAW_DATA_DETALLES = get_postgres_data_test(fecha_registro,config,variedad)
     
     #print("Depurando")
     '''
@@ -48,7 +50,7 @@ def cargar_datos_excel(path):
     
 
 
-def get_postgres_data_test(fecha_registro,config):
+def get_postgres_data_test(fecha_registro,config,variedad):
     from psycopg2 import OperationalError
 
 
@@ -69,7 +71,7 @@ def get_postgres_data_test(fecha_registro,config):
     # Generación y ejecución de query
     cur = connection.cursor()
     #print("Depurando")
-    db_cmd = CONTRAMUESTRAS_query_gen(fecha_registro)
+    db_cmd = CONTRAMUESTRAS_query_gen(fecha_registro,variedad)
 
     print(f"Ejecutando query: {db_cmd}")
     print("Extrayendo cajas de la base de datos...")
@@ -457,15 +459,15 @@ def query_generator_sqlServer(fecha_registro):
     return query
 
 
-def CONTRAMUESTRAS_query_gen(fecha_registro):
+def CONTRAMUESTRAS_query_gen(fecha_registro,variedad):
 
-    seleccion = input("Desea filtrar por variedad? (y/n) : ")
-
-    if seleccion == "y":
-        variedad = input("Escriba variedad a filtrar: ")
-        variedad = variedad.upper()
+    #seleccion = input("Desea filtrar por variedad? (y/n) : ")
+    seleccion = variedad
+    if seleccion != "TODAS":
+        #variedad = input("Escriba variedad a filtrar: ")
+        #variedad = variedad.upper()
         col_name = '"VariedadReal"'
-        query = f"SELECT * FROM raw.contramuestra_destino cd where g_tipo_muestra = 'CONTRAMUESTRA' and {col_name} = '{variedad}' and d_codigo_caja != '' and foto_defecto != '' and (fecha_registro = '{fecha_registro[0]}'" 
+        query = f"SELECT * FROM raw.contramuestra_destino cd where g_tipo_muestra = 'CONTRAMUESTRA' and {col_name} = '{seleccion}' and d_codigo_caja != '' and foto_defecto != '' and (fecha_registro = '{fecha_registro[0]}'" 
     else:
         query = f"SELECT * FROM raw.contramuestra_destino cd where g_tipo_muestra = 'CONTRAMUESTRA' and d_codigo_caja != '' and foto_defecto != '' and (fecha_registro = '{fecha_registro[0]}'" 
     
