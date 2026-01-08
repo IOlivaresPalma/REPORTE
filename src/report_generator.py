@@ -17,12 +17,12 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
     try:
         doc = DocxTemplate(TEMPLATE_PATH)
     except Exception as e:
-        print(f"❌ Cannot open Word Template: {e}")
+        print(f" Cannot open Word Template: {e}")
         return
 
     ########################################
     # 4. PROCESAMIENTO DE IMÁGENES
-    # Iteramos sobre los datos para convertir URLs en objetos de imagen de Word
+    # 
     print("🖼️ Procesando imágenes (esto puede tardar unos segundos)...")
     
     items_para_reporte = []
@@ -54,12 +54,12 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
         image_open     = process_image(url_foto_open,doc,size)
         image_open2    = process_image(url_foto_open2,doc,size)
         image_bandeja  = process_image(url_foto_bandeja,doc,size)
-        image_partida  = process_image(url_foto_partida,doc,size)
+        image_partida  = process_image(url_foto_partida,doc,size=4)
         if url_foto_defecto1 != "":
-            image_defecto1 = process_image(url_foto_defecto1,doc,size)
+            image_defecto1 = process_image(url_foto_defecto1,doc,size=4)
             item_procesado['foto_defecto1'] = image_defecto1
         if url_foto_defecto2 != "":
-            image_defecto2 = process_image(url_foto_defecto2,doc,size)
+            image_defecto2 = process_image(url_foto_defecto2,doc,size=4)
             item_procesado['foto_defecto2'] = image_defecto2
         
         # Guardamos el objeto imagen en una nueva clave que usarás en Word: {{ item.imagen_renderizada }}
@@ -86,7 +86,7 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
         detalles[dic] = lista
         i+=1
 
-    print(detalles)
+    #print(detalles)
     # 5. RENDERIZADO
     context = {
         'titulo': 'QUALITY CONTROL',
@@ -99,35 +99,34 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
         'details':detalles
     }
     
-    print("⚙️ Renderizando documento Word...")
+    print(" Renderizando documento Word...")
     try:
         doc.render(context)
         
         # 6. GUARDADO
         doc.save(OUTPUT_FILE)
-        print(f"✅ ¡ÉXITO! Reporte guardado en:\n   {OUTPUT_FILE}")
+        print(f" ¡ÉXITO! Reporte guardado en:\n   {OUTPUT_FILE}")
         
         # Opcional: Abrir la carpeta automáticamente (solo Windows)
         os.startfile(OUTPUT_DIR)
         
     except Exception as e:
-        print(f"❌ Error al guardar el documento final: {e}")
-        print("   (Sugerencia: Cierra el archivo Word si lo tienes abierto)")
+        print(f" Error al guardar el documento final: {e}")
     
     return
 
 def generate_directory(BASE_DIR,TEMPLATE_PATH):
     
+    ruta_documentos = os.path.expandvars("%userprofile%\\Documents")
     # Verificar existencia de plantilla
     if not os.path.exists(TEMPLATE_PATH):
-        print(f"❌ ERROR: No se encontró la plantilla en: {TEMPLATE_PATH}")
-        print("   Por favor crea la carpeta 'templates' y pon tu archivo 'master_template.docx' ahí.")
+        print(f" ERROR: No se encontró la plantilla en: {TEMPLATE_PATH}")
         return
     else:
         # Rutas de salida (creamos carpeta con fecha actual para orden)
         fecha_hoy = datetime.now().strftime("%Y-%m-%d")
         fecha_hoy_hora = datetime.now().strftime("%Y-%m-%d %H-%M")
-        OUTPUT_DIR = os.path.join(BASE_DIR, 'output', fecha_hoy)
+        OUTPUT_DIR = os.path.join(ruta_documentos, 'REPORTE CONTRAMUESTRAS', fecha_hoy)
         OUTPUT_FILE = os.path.join(OUTPUT_DIR, f'Reporte_Calidad_{fecha_hoy_hora}.docx')
 
         # Crear directorio de salida si no existe

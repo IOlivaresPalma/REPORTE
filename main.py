@@ -2,7 +2,7 @@ import os
 import sys
 
 # --- IMPORTACIÓN DE MÓDULOS PROPIOS ---
-# Aseguramos que Python encuentre la carpeta 'src'
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 src_path = os.path.join(current_dir, 'src')
 sys.path.append(src_path)
@@ -10,13 +10,12 @@ sys.path.append(src_path)
 # Se importan archivos desde el file
 
 try:
-    # Intenta importar tus módulos si ya creaste los archivos
+    # Importar codigos src
     from load_data import cargar_datos_excel,get_data
     from get_image import obtener_imagen_procesada
     from report_generator import generate_word,generate_directory
 except ImportError:
-    # FALLBACK: Si aún no creas los archivos en /src, usamos estas funciones dummy
-    # para que el script corra sin errores ahora mismo.
+    
     print("⚠️ ALERTA: Usando funciones de prueba (Módulos src no encontrados)")
 
 
@@ -24,8 +23,21 @@ except ImportError:
 
 def main():
 
-    fecha_filtro = input("Ingrese fecha de registro en formato YYYY-MM-DD: ")
-    
+    #fecha_filtro = input("Ingrese fecha de registro en formato YYYY-MM-DD: ")
+    if len(sys.argv) > 1:
+        fecha_filtro = sys.argv[1] # El argumento que enviaste desde C#
+        if ";" in fecha_filtro:
+            lista_fechas = fecha_filtro.split(";")
+        else:
+            lista_fechas = [fecha_filtro]
+    else:
+        # Por si lo ejecutas manual para probar
+        fecha_filtro = "2026-01-01" 
+
+    for fecha in lista_fechas:
+        print(f"filtrando por: {fecha}")
+
+
     # 1. CONFIGURACIÓN DE RUTAS
     # Usamos rutas relativas para que funcione en cualquier PC
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -39,16 +51,13 @@ def main():
 
     # 2. CARGA DE DATOS
     try:
-        print(f"📥 Cargando datos...")
-        # Si usas el Excel real, descomenta la siguiente línea y asegúrate que el archivo existe
-        # datos_crudos = cargar_datos_excel(DATA_PATH) 
+        print(f" Cargando datos...")
+        # Cargar datos de condicion de fruta y detalle de cajas
+        RAW_DATA_CONDICION,RAW_DATA_DETALLES = get_data(lista_fechas)
         
-        # Por ahora usamos el fallback/simulación si no hay excel
-        RAW_DATA_CONDICION,RAW_DATA_DETALLES = get_data(fecha_filtro)
-        
-        print(f"   ✅ Se cargaron {len(RAW_DATA_CONDICION)} registros.")
+        print(f"    Se cargaron {len(RAW_DATA_CONDICION)} registros.")
     except Exception as e:
-        print(f"❌ Error cargando datos: {e}")
+        print(f" Error cargando datos: {e}")
         return
 
     

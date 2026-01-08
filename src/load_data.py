@@ -8,23 +8,29 @@ def get_data(fecha_registro="2025-01-01"):
 
     config = dotenv_values(".env")
     
-    RAW_DATA_CONDICION,LISTA_CAJAS = get_sqlServer_data(config,fecha_registro)
+    #RAW_DATA_CONDICION,LISTA_CAJAS = get_sqlServer_data(config,fecha_registro)
 
-    RAW_DATA_DETALLES= get_postgres_data(LISTA_CAJAS,config)
+    #RAW_DATA_DETALLES= get_postgres_data(LISTA_CAJAS,config)
+
+    RAW_DATA_CONDICION,RAW_DATA_DETALLES = get_postgres_data_test(fecha_registro,config)
     
-    print("Depurando")
+    #print("Depurando")
+    '''
     for i in RAW_DATA_CONDICION:
         #print(i)
         for j in RAW_DATA_DETALLES:
             #print(j)
             if j['Box_Id'] == i['box_id']:
                 j['Evaluation_Date'] = i['fecha_registro']
-
+    '''
     
     return RAW_DATA_CONDICION,RAW_DATA_DETALLES
 
+
+
+# Prueba de datos
 def cargar_datos_excel(path):
-    # Datos simulados basados en tu captura de pantalla
+    
     return [
         {
             'box_id': '30395715', 'producer': 'PRIZE PROSERVICE', 'csg': '178244',
@@ -40,6 +46,180 @@ def cargar_datos_excel(path):
         }
     ]
     
+
+
+def get_postgres_data_test(fecha_registro,config):
+    from psycopg2 import OperationalError
+
+
+    print("Prueba conexión postgresql")
+    # Check server connection
+    try:
+        connection = psycopg2.connect(database = config["DB_NAME_POST"],
+                                  user = config["DB_USER_POST"],
+                                  host = config["DB_HOST_POST"],
+                                  password = config["DB_PASSWORD_POST"],
+                                  port = config["DB_PORT_POST"]
+                                 )
+        print("Conexión exitosa!")
+    except OperationalError as e:
+        print(f"No fue posible conectarse a la base de datos. Detalles: {e}")
+        return False
+
+    # Generación y ejecución de query
+    cur = connection.cursor()
+    #print("Depurando")
+    db_cmd = CONTRAMUESTRAS_query_gen(fecha_registro)
+
+    print(f"Ejecutando query: {db_cmd}")
+    print("Extrayendo cajas de la base de datos...")
+    cur.execute(db_cmd)
+    rows = cur.fetchall()
+    print("Extracción completada !")
+    
+    LISTA_LOTES = []
+    CONDITION_RAW = []
+    DETAIL_RAW    = []
+
+    LISTA_VARIEDADES = []
+
+    condicion_fruta_empty = {'box_id':'',
+                       'soft':'',
+                       'wound':'',
+                       'bruise':'',
+                       'stain':'',
+                       'cracking':'',
+                       'no_stem':'',
+                       'pitting':'',
+                       'decay':'',
+                       'avg_brix':'',
+                       'Firmness':'',
+                       'open':'',
+                       'foto_open':'',
+                       'foto_open2':'',
+                       'foto_etiqueta': '',
+                       'foto_bandeja':'',
+                       'foto_frutapartida':'',
+                       'foto_defecto1':'',
+                       'foto_defecto2' : '',
+                       'fecha_registro': ''
+                }
+
+    detalles_caja = {"Box_Id":"",
+                     "Producer":"",
+                     "csg":"",
+                     "Lot":"",
+                     "Variety":"",
+                     "Packing_Date":"",
+                     "Evaluation_Date":"",
+                     "Package":"",
+                     "Label":"",
+                     "Size":""
+         
+                    }
+
+    # Adición de datos al diccionario
+    for dato in rows:
+        #print(dato)
+        # Copia de los diccionarios para no sobreescribir
+        condicion_fruta = condicion_fruta_empty.copy()
+        caja_detail = detalles_caja.copy()
+
+        # CONDICION DE FRUTA
+        # ==============================================================
+        condicion_fruta['box_id']  = dato[15]
+        condicion_fruta['soft']    = str(dato[31])+" %"
+        condicion_fruta['wound']   = str(dato[32])+" %"
+        condicion_fruta['bruise']  = str(dato[33])+" %"
+        condicion_fruta['stain']   = str(dato[34])+" %"
+        condicion_fruta['cracking']= str(dato[35])+" %"
+        condicion_fruta['no_stem'] = str(dato[36])+" %"
+        condicion_fruta['pitting'] = str(dato[37])+" %"
+        condicion_fruta['decay']   = str(dato[38])+" %"
+        condicion_fruta['avg_brix']= round(dato[43],2)
+        
+        condicion_fruta['foto_open']=dato[22]
+        condicion_fruta['foto_open2']=dato[24]
+        condicion_fruta['foto_bandeja']=dato[41]
+        condicion_fruta['foto_etiqueta']=dato[42]
+        condicion_fruta['foto_frutapartida']=dato[25]
+
+        defectos = dato[40].split(" | ")
+        
+        condicion_fruta['foto_defecto1']= defectos[0]
+        if len(defectos) == 2:    
+            condicion_fruta['foto_defecto2'] = defectos[1]
+
+        match dato[20]:
+            case "BUENO":
+                    condicion_fruta['Firmness']= "GOOD"
+            case "REGULAR":
+                    condicion_fruta['Firmness']= "FAIR"
+            case "MALO":
+                    condicion_fruta['Firmness']= "POOR"
+        
+        
+        match dato[21]:
+            case "BUENO":
+                    condicion_fruta['open']= "GOOD"
+            case "REGULAR":
+                    condicion_fruta['open']= "FAIR"
+            case "MALO":
+                    condicion_fruta['open']= "POOR"
+
+        condicion_fruta['fecha_registro'] = dato[12]
+
+        # ==============================================================
+        # ==============================================================
+
+        # DETALLES CAJA
+        # ==============================================================
+        caja_detail["Box_Id"]            = dato[15]
+        caja_detail["Producer"]          = "PRIZE PROSERVICE"
+        caja_detail["csg"]               = ""                    # Se rellena despues
+        caja_detail["Lot"]               = dato[47]
+        caja_detail["Variety"]           = dato[51]              # Variedad Timbrada
+        caja_detail["Packing_Date"]      = dato[45].strftime("%Y-%m-%d") if dato[45] is not None else dato[45]
+        caja_detail["Evaluation_Date"]   = dato[12]                    # Se saca de postgres
+        caja_detail["Package"] = dato[-1]                        # codConfeccion
+        caja_detail["Label"] = dato[52]                          # Marca
+        caja_detail["Size"] = dato[53]                           # Calibre Timbrado
+        
+
+        #Se agrega variedad a la lista
+        LISTA_VARIEDADES.append(dato[51])
+
+        DETAIL_RAW.append(caja_detail)
+        CONDITION_RAW.append(condicion_fruta)
+        LISTA_LOTES.append(dato[47])
+        # ===============================================================
+
+
+    query = query_postgres_recepciones(LISTA_LOTES)
+    print(f"Ejecutando query: {query}")
+
+    cur.execute(query)
+    rows = cur.fetchall()
+
+    print("Extracción completada!")
+
+    for diccionario in DETAIL_RAW:
+        for row in rows:        
+            if int(diccionario["Lot"]) == row[0]:
+                diccionario["csg"] = row[1]
+        
+        #Descomentar para depurar
+        #print(diccionario["Lot"],diccionario["csg"])
+            
+
+    # Cerrar conexión
+    connection.commit()
+    connection.close()
+    return CONDITION_RAW,DETAIL_RAW
+
+
+
+
 
 def get_postgres_data(LISTA_CAJAS,config):
     from psycopg2 import OperationalError
@@ -133,7 +313,11 @@ def get_sqlServer_data(config,fecha_registro):
     
     connection = pyodbc.connect(driver = "{SQL Server}",server=config["DB_HOST"],database = config["DB_NAME"],uid = config["DB_USER"],pwd = config["DB_PASSWORD"])
     cur = connection.cursor()
-    db_cmd = f"SELECT * FROM dbo.v_CONTRAMUESTRAS where g_tipo_muestra = 'CONTRAMUESTRA' and d_codigo_caja != '' and foto_defecto != '' and fecha_registro= '{fecha_registro}'"
+
+    # Descomentar para depurar
+    print(fecha_registro)
+    db_cmd = query_generator_sqlServer(fecha_registro)
+    #db_cmd = f"SELECT * FROM dbo.v_CONTRAMUESTRAS where g_tipo_muestra = 'CONTRAMUESTRA' and d_codigo_caja != '' and foto_defecto != '' and fecha_registro= '{fecha_registro}'"
     res = cur.execute(db_cmd)
 
     RAW_DATA = []
@@ -255,5 +439,40 @@ def query_generator_postgres(DETALLE_CAJA):
         while i < len(DETALLE_CAJA):
             query += f" or {col_name} = '{DETALLE_CAJA[i]}'"
             i+=1
-        
+    
+    query+= ' ORDER BY c."codCaja" ASC'
+    return query
+
+
+
+def query_generator_sqlServer(fecha_registro):
+    
+    query = f"SELECT * FROM dbo.v_CONTRAMUESTRAS where g_tipo_muestra = 'CONTRAMUESTRA' and d_codigo_caja != '' and foto_defecto != '' and (fecha_registro = '{fecha_registro[0]}'"
+    i = 1
+    while i<len(fecha_registro):
+        query += f" or fecha_registro = '{fecha_registro[i]}'"
+        i+=1
+    query += ") ORDER BY d_codigo_caja ASC"
+    
+    return query
+
+
+def CONTRAMUESTRAS_query_gen(fecha_registro):
+
+    seleccion = input("Desea filtrar por variedad? (y/n) : ")
+
+    if seleccion == "y":
+        variedad = input("Escriba variedad a filtrar: ")
+        variedad = variedad.upper()
+        col_name = '"VariedadReal"'
+        query = f"SELECT * FROM raw.contramuestra_destino cd where g_tipo_muestra = 'CONTRAMUESTRA' and {col_name} = '{variedad}' and d_codigo_caja != '' and foto_defecto != '' and (fecha_registro = '{fecha_registro[0]}'" 
+    else:
+        query = f"SELECT * FROM raw.contramuestra_destino cd where g_tipo_muestra = 'CONTRAMUESTRA' and d_codigo_caja != '' and foto_defecto != '' and (fecha_registro = '{fecha_registro[0]}'" 
+    
+    i = 1
+    while i<len(fecha_registro):
+        query += f" or fecha_registro = '{fecha_registro[i]}'"
+        i+=1
+    query+= ") ORDER BY d_codigo_caja ASC"
+
     return query
