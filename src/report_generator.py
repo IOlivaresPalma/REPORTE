@@ -6,7 +6,7 @@ import requests
 import io
 
 
-def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
+def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES,callback_progreso=None):
 
     # Rutas de entrada
     TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates', 'master_template.docx')
@@ -54,12 +54,12 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
         image_open     = process_image(url_foto_open,doc,size)
         image_open2    = process_image(url_foto_open2,doc,size)
         image_bandeja  = process_image(url_foto_bandeja,doc,size)
-        image_partida  = process_image(url_foto_partida,doc,size=4)
+        image_partida  = process_image(url_foto_partida,doc,size=4.5)
         if url_foto_defecto1 != "":
-            image_defecto1 = process_image(url_foto_defecto1,doc,size=4)
+            image_defecto1 = process_image(url_foto_defecto1,doc,size=4.5)
             item_procesado['foto_defecto1'] = image_defecto1
         if url_foto_defecto2 != "":
-            image_defecto2 = process_image(url_foto_defecto2,doc,size=4)
+            image_defecto2 = process_image(url_foto_defecto2,doc,size=4.5)
             item_procesado['foto_defecto2'] = image_defecto2
         
         # Guardamos el objeto imagen en una nueva clave que usarás en Word: {{ item.imagen_renderizada }}
@@ -74,7 +74,14 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
     
 
         items_para_reporte.append(item_procesado)
-        print(f"   - Procesado item {idx+1}/{len(RAW_DATA)}: {item.get('box_id', 'Sin ID')}")
+        total_cajas = len(RAW_DATA)
+        mensaje = f"   - Procesado item {idx+1}/{total_cajas}: {item.get('box_id', 'Sin ID')}"
+
+        if callback_progreso:
+            callback_progreso(mensaje,idx+1,total_cajas) # Le pasamos texto y números
+        else:
+            # Si pruebas sin interfaz, sigue usando print
+            print(mensaje)
     
     detalles = {}
     i = 0
@@ -117,7 +124,7 @@ def generate_word(BASE_DIR,RAW_DATA,RAW_DATA_DETALLES):
 
 def generate_directory(BASE_DIR,TEMPLATE_PATH):
     
-    
+
 
     ruta_documentos = os.path.expandvars("%userprofile%\\Documents")
     # Verificar existencia de plantilla

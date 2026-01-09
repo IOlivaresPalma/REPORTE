@@ -19,9 +19,9 @@ except ImportError:
     print("⚠️ ALERTA: Usando funciones de prueba (Módulos src no encontrados)")
 
 
-def generador(fechas_seleccionadas, filtro_var, filtro_prod):
+def generador(fechas_seleccionadas, filtro_var,callback_progreso):
 
-    print(fechas_seleccionadas, filtro_var, filtro_prod)
+    #print(fechas_seleccionadas, filtro_var, filtro_prod)
     
     #fecha_filtro = input("Ingrese fecha de registro en formato YYYY-MM-DD: ")
     '''
@@ -71,7 +71,7 @@ def generador(fechas_seleccionadas, filtro_var, filtro_prod):
         return
 
     
-    generate_word(BASE_DIR,RAW_DATA_CONDICION,RAW_DATA_DETALLES)
+    generate_word(BASE_DIR,RAW_DATA_CONDICION,RAW_DATA_DETALLES,callback_progreso)
 
     #print("Informe generado - prueba v0.1.1")
     

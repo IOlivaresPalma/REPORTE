@@ -462,12 +462,12 @@ def query_generator_sqlServer(fecha_registro):
 def CONTRAMUESTRAS_query_gen(fecha_registro,variedad):
 
     #seleccion = input("Desea filtrar por variedad? (y/n) : ")
-    seleccion = variedad
-    if seleccion != "TODAS":
+    seleccion = ",".join(f"'{x}'" for x in variedad)
+    if seleccion != None:
         #variedad = input("Escriba variedad a filtrar: ")
         #variedad = variedad.upper()
         col_name = '"VariedadReal"'
-        query = f"SELECT * FROM raw.contramuestra_destino cd where g_tipo_muestra = 'CONTRAMUESTRA' and {col_name} = '{seleccion}' and d_codigo_caja != '' and foto_defecto != '' and (fecha_registro = '{fecha_registro[0]}'" 
+        query = f"SELECT * FROM raw.contramuestra_destino cd where g_tipo_muestra = 'CONTRAMUESTRA' and {col_name} in ({seleccion}) and d_codigo_caja != '' and foto_defecto != '' and (fecha_registro = '{fecha_registro[0]}'" 
     else:
         query = f"SELECT * FROM raw.contramuestra_destino cd where g_tipo_muestra = 'CONTRAMUESTRA' and d_codigo_caja != '' and foto_defecto != '' and (fecha_registro = '{fecha_registro[0]}'" 
     
@@ -475,6 +475,6 @@ def CONTRAMUESTRAS_query_gen(fecha_registro,variedad):
     while i<len(fecha_registro):
         query += f" or fecha_registro = '{fecha_registro[i]}'"
         i+=1
-    query+= ") ORDER BY d_codigo_caja ASC"
+    query+= ") ORDER BY fecha_registro DESC"
 
     return query
