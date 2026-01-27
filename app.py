@@ -25,8 +25,8 @@ class AppFrutas(tk.Tk):
     def __init__(self):
         super().__init__()
         
-        self.title("Sistema de Reportes Frutícola")
-        self.geometry("500x750") # Aumentamos altura para que quepa la lista
+        self.title("Quality control")
+        self.geometry("500x750") # Altura de ventana
         
         self.LISTA_VARIEDADES = [
             "AREKO", "BING", "KORDIA", "LAPINS", "PACIFIC RED", 
@@ -35,6 +35,8 @@ class AppFrutas(tk.Tk):
             "SYMPHONY", "VAN"
         ]
         
+        self.LISTA_ESPECIE = ["CEREZA","NECTARIN"]
+
         self.fechas_seleccionadas = []
         # Variables de control para activar/desactivar filtros
         self.var_filtrar_variedad = tk.BooleanVar()
@@ -47,7 +49,7 @@ class AppFrutas(tk.Tk):
         main_frame.pack(fill=tk.BOTH, expand=True)
 
         # --- SECCIÓN 1: FECHAS ---
-        lbl_titulo = ttk.Label(main_frame, text="1. Selección de Fechas", font=("Arial", 12, "bold"))
+        lbl_titulo = ttk.Label(main_frame, text=" Selección de Fechas", font=("Arial", 12, "bold"))
         lbl_titulo.pack(anchor="w", pady=(0, 5))
 
         date_frame = ttk.Frame(main_frame)
@@ -70,9 +72,39 @@ class AppFrutas(tk.Tk):
         ttk.Separator(main_frame, orient='horizontal').pack(fill='x', pady=15)
 
         # --- SECCIÓN 2: FILTROS ---
-        lbl_filtros = ttk.Label(main_frame, text="2. Filtros Opcionales", font=("Arial", 12, "bold"))
+        lbl_filtros = ttk.Label(main_frame, text=" Filtros Opcionales", font=("Arial", 12, "bold"))
         lbl_filtros.pack(anchor="w", pady=(0, 5))
 
+        # ==========================================================================================
+        # FILTRO ESPECIE
+
+        
+
+        frame_esp = ttk.LabelFrame(main_frame,text="Seleccione una especie (Obligatorio) : ",padding=13)
+        frame_esp.pack(fill=tk.X,pady=5)
+
+        self.combo_especie = ttk.Combobox(main_frame,values=self.LISTA_ESPECIE,state="readonly",width=30)
+
+        self.combo_especie.pack(pady=5)
+
+
+        '''
+        esp_container = ttk.Frame(frame_esp)
+        esp_container.pack(fill=tk.X,pady=5)
+
+        scroll_esp = ttk.Scrollbar(esp_container)
+        scroll_esp.pack(side=tk.RIGHT,fill=tk.Y)
+
+        self.listbox_especies = tk.Listbox(esp_container, selectmode=tk.EXTENDED, 
+                                           height=5, yscrollcommand=scrollbar.set, exportselection=False)
+        
+         # Llenar la lista
+        for var in self.LISTA_ESPECIE:
+            self.listbox_especies.insert(tk.END, var)
+
+        self.listbox_especies.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        scroll_esp.config(command=self.listbox_especies.yview)
+        '''
         # --- FILTRO VARIEDAD (SELECCIÓN MÚLTIPLE) ---
         frame_var = ttk.LabelFrame(main_frame, text=" Variedades ", padding=10)
         frame_var.pack(fill=tk.X, pady=5)
@@ -99,7 +131,7 @@ class AppFrutas(tk.Tk):
         self.listbox_variedades.pack(side=tk.LEFT, fill=tk.X, expand=True)
         scrollbar.config(command=self.listbox_variedades.yview)
         
-        # Texto de ayuda pequeño
+        # Texto de ayuda
         lbl_help = ttk.Label(frame_var, text="(Usa Ctrl + Click para seleccionar varias)", font=("Arial", 8, "italic"))
         lbl_help.pack(anchor="w")
 
@@ -117,7 +149,7 @@ class AppFrutas(tk.Tk):
 
         #ttk.Separator(main_frame, orient='horizontal').pack(fill='x', pady=15)
 
-        # --- BOTÓN EJECUTAR ---
+        # --- BOTON EJECUTAR ---
         style = ttk.Style()
         style.configure("Bold.TButton", font=("Arial", 10, "bold"))
         self.btn_run = ttk.Button(main_frame, text="GENERAR INFORME WORD", 
@@ -127,7 +159,7 @@ class AppFrutas(tk.Tk):
         # Inicializar estado visual
         self.toggle_filtros()
 
-    # --- MÉTODOS DE FECHAS ---
+    # --- METODOS DE FECHAS ---
     def agregar_fecha(self):
         fecha = self.cal_entry.get_date().strftime("%Y-%m-%d")
         if fecha not in self.fechas_seleccionadas:
@@ -148,16 +180,16 @@ class AppFrutas(tk.Tk):
         for item in self.tree_fechas.get_children(): self.tree_fechas.delete(item)
         for f in self.fechas_seleccionadas: self.tree_fechas.insert("", "end", values=(f,))
 
-    # --- MÉTODOS DE FILTROS ---
+    # --- METODOS DE FILTROS ---
     def toggle_filtros(self):
-        # Lógica visual para la lista de variedades
+        # Logica visual para la lista de variedades
         if self.var_filtrar_variedad.get():
             self.listbox_variedades.config(state="normal", bg="white")
         else:
             self.listbox_variedades.selection_clear(0, tk.END) # Limpiar selección al desactivar
             self.listbox_variedades.config(state="disabled", bg="#f0f0f0")
 
-        # Lógica para productor
+        # Logica para productor
         #estado_prod = "normal" if self.var_filtrar_productor.get() else "disabled"
         #self.entry_productor.config(state=estado_prod)
 
@@ -171,12 +203,18 @@ class AppFrutas(tk.Tk):
         
         #self.entry_productor.delete(0, tk.END)
         self.listbox_variedades.selection_clear(0, tk.END) # Limpiar selección múltiple
+        self.combo_especie.select_clear(0,tk.END)
 
     def ejecutar_proceso(self):
         if not self.fechas_seleccionadas:
             messagebox.showerror("Error", "Selecciona al menos una fecha.")
             return
+        especie = self.combo_especie.get()
 
+        if not especie:
+            messagebox.showwarning("Campo Obligatorio","Por favor seleccione una especie")
+            self.combo_especie.focus()
+            return
         # 1. Obtener Variedades (NUEVA LÓGICA)
         if self.var_filtrar_variedad.get():
             indices = self.listbox_variedades.curselection() # Retorna tupla de índices (0, 2, 5)
@@ -219,8 +257,8 @@ class AppFrutas(tk.Tk):
         self.btn_run.config(state="disabled")
 
         try:
-            # Pasamos la LISTA DE VARIEDADES a tu generador
-            generador(self.fechas_seleccionadas, lista_variedades_final, callback_progreso=cb_gui)
+            # Pasamos la LISTA DE VARIEDADES a generador
+            generador(self.fechas_seleccionadas, lista_variedades_final,especie,callback_progreso=cb_gui)
             
             ventana_carga.destroy()
             if messagebox.askyesno("Éxito", "Informe listo.\n¿Otro reporte?"):

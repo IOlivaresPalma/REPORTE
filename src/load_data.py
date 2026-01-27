@@ -428,6 +428,12 @@ def query_postgres_recepciones(LISTA_LOTES):
 
 # REVISAR...
 def query_generator_postgres(DETALLE_CAJA):
+    '''
+    Docstring for query_generator_postgres
+    
+    :param DETALLE_CAJA: cajas que se deben filtrar
+
+    '''
     
     col_name = 'c."codCaja"'
     if len(DETALLE_CAJA) == 0:
@@ -448,6 +454,11 @@ def query_generator_postgres(DETALLE_CAJA):
 
 
 def query_generator_sqlServer(fecha_registro):
+    '''
+    Docstring for query_generator_sqlServer
+    
+    :param fecha_registro: fechas a filtrar en el documento
+    '''
     
     query = f"SELECT * FROM dbo.v_CONTRAMUESTRAS where g_tipo_muestra = 'CONTRAMUESTRA' and d_codigo_caja != '' and foto_defecto != '' and (fecha_registro = '{fecha_registro[0]}'"
     i = 1
@@ -460,10 +471,15 @@ def query_generator_sqlServer(fecha_registro):
 
 
 def CONTRAMUESTRAS_query_gen(fecha_registro,variedad):
+    '''
+    Docstring for CONTRAMUESTRAS_query_gen
+    
+    :param fecha_registro: lista con las fechas filtradas
+    :param variedad: variedades de fruta a incluir en el reporte
+    '''
 
-    #seleccion = input("Desea filtrar por variedad? (y/n) : ")
-    seleccion = ",".join(f"'{x}'" for x in variedad)
-    if seleccion != None:
+    if variedad != None:
+        seleccion = ",".join(f"'{x}'" for x in variedad)
         #variedad = input("Escriba variedad a filtrar: ")
         #variedad = variedad.upper()
         col_name = '"VariedadReal"'
